@@ -11,105 +11,58 @@
 <html>
 <head>
     <title>Home</title>
-    <link rel="stylesheet" href="/asset/style.css">
     <link rel="stylesheet" href="/asset/bootstrap.min.css">
+    <link rel="stylesheet" href="/asset/library.css">
 </head>
 <body>
-<div class="container" id="wrapper">
-    <div id="main-content">
-        <div id="menu">
-            <!--TẠO NÚT HIỂN THỊ BOOK-->
-            <a href="/library?action=book" class="btn btn-primary">
-                Book
-            </a>
+<div class="container">
 
-            <!--TẠO NÚT HIỂN THỊ STUDENT-->
-            <a href="/library?action=student" class="btn btn-primary">
-                Student
-            </a>
-
-            <!--TẠO NÚT HIỂN THỊ CARD-->
-            <a href="/library?action=card" class="btn btn-primary">
-                Card
-            </a>
+    <!--TẠO THANH MENU TRÊN ĐẦU CHỨA BOOK, STUDENT, CARD-->
+    <div id="menu">
+        <div id="position-menu">
+            <a href="/library?action=book">Book</a>
+            <a href="/library?action=student">Student</a>
+            <a href="/library?action=card">Card</a>
         </div>
+    </div>
+    <!--KẾT THÚC-->
 
+    <!--TẠO THÂN TRANG GỒM CÁC NÚT SERVICE VÀ NỘI DUNG CHÍNH CỦA TRANG-->
+    <div id="body-page">
 
-        <!--BOOK-->
+        <!--PHẦN NỘI DUNG CỦA TRANG BOOK-->
         <c:if test="${select==1}">
-            <div>
-                <h2>Danh sách sách</h2>
-                <table class="table">
-                    <thread>
-                        <tr>
-                            <th scope="col">Mã sách</th>
-                            <th scope="col">Tên sách</th>
-                            <th scope="col">Tác giả</th>
-                            <th scope="col">Mô tả</th>
-                            <th scope="col">Số lượng</th>
-                            <th scope="col"></th>
-                            <th scope="col"></th>
-                            <th scope="col"></th>
-                        </tr>
-                    </thread>
-                    <tbody>
-                    <c:forEach items="${books}" var="book">
-                        <tr class="col">
-                            <td>${book.bookId}</td>
-                            <td>${book.bookName}</td>
-                            <td>${book.author}</td>
-                            <td>${book.description}</td>
-                            <td>${book.quantity}</td>
-                            <td>
-                                <form action="/library" method="post">
-                                    <input type="hidden" name="action" value="initBorrow">
-                                    <input type="hidden" name="initBookId" value="${book.bookId}">
-                                    <input type="hidden" name="initBookName" value="${book.bookName}">
-                                    <input type="hidden" name="initAuthor" value="${book.author}">
-                                    <input type="hidden" name="initDescription" value="${book.description}">
-                                    <input type="hidden" name="initQuantity" value="${book.quantity}">
-                                    <input type="submit" class="btn btn-primary" value="Borrow">
-                                </form>
-                            </td>
-                            <td>
-                                <button
-                                        type="button"
-                                        class="btn btn-primary"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#editBookModal"
-                                        data-bs-bookId="${book.bookId}"
-                                        data-bs-bookName="${book.bookName}"
-                                        data-bs-author="${book.author}"
-                                        data-bs-description="${book.description}"
-                                        data-bs-quantity="${book.quantity}">
-                                    Edit
-                                </button>
-                            </td>
-                            <td>
-                                <button
-                                        type="button"
-                                        class="btn btn-primary"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#delBookModal"
-                                        data-bs-bookId="${book.bookId}">
-                                    Del
-                                </button>
-                            </td>
-                        </tr>
-                    </c:forEach>
-                    </tbody>
-                </table>
+            <div class="content">
 
-                <!--TẠO MODAL SỬA THÔNG TIN SÁCH-->
+                <!--TẠO CÁC NÚT SERVICE BÊN TRÁI-->
+                <div class="service">
+                    <button
+                            type="button"
+                            class="btn btn-primary"
+                            data-bs-toggle="modal"
+                            data-bs-target="#createBookModal">
+                        Create
+                    </button>
+                    <button
+                            type="button"
+                            class="btn btn-primary"
+                            data-bs-toggle="modal"
+                            data-bs-target="#searchBookModal">
+                        Search
+                    </button>
+                </div>
+                <!--KẾT THÚC TẠO CÁC NÚT SERVICE BÊN TRÁI-->
+
+                <!--TẠO MODAL THÊM SÁCH VÀO THƯ VIỆN-->
                 <div class="modal fade"
-                     id="editBookModal"
+                     id="createBookModal"
                      tabindex="-1"
-                     aria-labelledby="editBookModalLabel"
+                     aria-labelledby="createBookModalLabel"
                      aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="editBookModalLabel">Sửa thông tin</h5>
+                                <h5 class="modal-title" id="createBookModalLabel">Thêm sách vào thư viện</h5>
                                 <button type="button"
                                         class="btn-close"
                                         data-bs-dismiss="modal"
@@ -118,28 +71,27 @@
                             </div>
                             <div class="modal-body">
                                 <form action="/library" method="post">
-                                    <input type="hidden" name="action" value="editBook">
+                                    <input type="hidden" name="action" value="createBook">
                                     <div class="mb-3">
-                                        <input type="hidden" class="form-control" id="bookId" name="bookId"/>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="bookName" class="col-form-label">Tên sách:</label>
-                                        <input type="text" class="form-control" id="bookName" name="newBookName"
+                                        <label for="createBookName" class="col-form-label">Tên sách:</label>
+                                        <input type="text" class="form-control" id="createBookName"
+                                               name="createBookName"
                                                required/>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="author" class="col-form-label">Tác giả:</label>
-                                        <input type="text" class="form-control" id="author" name="newAuthor"
+                                        <label for="createAuthor" class="col-form-label">Tác giả:</label>
+                                        <input type="text" class="form-control" id="createAuthor" name="createAuthor"
                                                required/>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="description" class="col-form-label">Mô tả:</label>
-                                        <input type="text" class="form-control" id="description"
-                                               name="newDescription" required/>
+                                        <label for="createDescription" class="col-form-label">Mô tả:</label>
+                                        <input type="text" class="form-control" id="createDescription"
+                                               name="createDescription" required/>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="quantity" class="col-form-label">Số lượng:</label>
-                                        <input type="number" class="form-control" id="quantity" name="newQuantity"
+                                        <label for="createQuantity" class="col-form-label">Số lượng:</label>
+                                        <input type="number" class="form-control" id="createQuantity"
+                                               name="createQuantity"
                                                required/>
                                     </div>
                                     <div class="modal-footer">
@@ -153,18 +105,18 @@
                         </div>
                     </div>
                 </div>
+                <!--KẾT THÚC TẠO MODAL THÊM SÁCH VÀO THƯ VIỆN-->
 
-                <!--TẠO MODAL XÓA SÁCH-->
+                <!--TẠO MODAL TÌM KIẾM SÁCH THEO TÊN-->
                 <div class="modal fade"
-                     id="delBookModal"
+                     id="searchBookModal"
                      tabindex="-1"
-                     aria-labelledby="delBookModalLabel"
+                     aria-labelledby="searchBookModalLabel"
                      aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="delBookModalLabel">Bạn có chắc chắn muốn xóa sách
-                                    này?</h5>
+                                <h5 class="modal-title" id="searchBookModalLabel">Tìm kiếm sách theo tên</h5>
                                 <button type="button"
                                         class="btn-close"
                                         data-bs-dismiss="modal"
@@ -173,9 +125,12 @@
                             </div>
                             <div class="modal-body">
                                 <form action="/library" method="post">
-                                    <input type="hidden" name="action" value="delBook">
+                                    <input type="hidden" name="action" value="searchBookByName">
                                     <div class="mb-3">
-                                        <input type="hidden" class="form-control" id="delBookId" name="delBookId"/>
+                                        <label for="searchBookName" class="col-form-label">Tên sách:</label>
+                                        <input type="text" class="form-control" id="searchBookName"
+                                               name="searchBookName"
+                                               required/>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -188,106 +143,213 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </c:if>
+                <!--KẾT THÚC TẠO MODAL TÌM KIẾM SÁCH THEO TÊN-->
 
+                <!--NỘI DUNG CHÍNH CỦA TRANG BOOK-->
+                <div class="main-content">
+                    <div class="popup">
+                        <c:if test="${error!=null}">
+                            <h3>${error}</h3>
+                        </c:if>
+                    </div>
 
-        <!--STUDENT-->
-        <c:if test="${select==2}">
-            <div>
-                <h2>Danh sách sinh viên</h2>
-                <table class="table">
-                    <thread>
-                        <tr>
-                            <th scope="col">Mã sinh viên</th>
-                            <th scope="col">Tên sinh viên</th>
-                            <th scope="col">Lớp</th>
-                        </tr>
-                    </thread>
-                    <tbody>
-                    <c:forEach items="${students}" var="student">
-                        <tr class="col">
-                            <td>${student.stuId}</td>
-                            <td>${student.stuName}</td>
-                            <td>${student.grade}</td>
-                        </tr>
-                    </c:forEach>
-                    </tbody>
-                </table>
-            </div>
-        </c:if>
-
-
-        <!--CARD-->
-        <c:if test="${select==3}">
-            <div>
-                <h2>Danh sách thẻ mượn sách</h2>
-                <table class="table">
-                    <thread>
-                        <tr>
-                            <th scope="col">Mã thẻ</th>
-                            <th scope="col">Tên sách</th>
-                            <th scope="col">Tác giả</th>
-                            <th scope="col">Tên sinh viên</th>
-                            <th scope="col">Lớp</th>
-                            <th scope="col">Ngày mượn</th>
-                            <th scope="col">Ngày trả</th>
-                            <th scope="col"></th>
-                        </tr>
-                    </thread>
-                    <tbody>
-                    <c:forEach items="${cards}" var="card">
-                        <tr class="col">
-                            <td>${card.cardId}</td>
-                            <td>${card.book.getBookName()}</td>
-                            <td>${card.book.getAuthor()}</td>
-                            <td>${card.student.getStuName()}</td>
-                            <td>${card.student.getGrade()}</td>
-                            <td>
-                                <fmt:parseDate value="${card.loanDate}" pattern="yyyy-MM-dd" type="date"
-                                               var="loanDateFormat"/>
-                                <fmt:formatDate value="${loanDateFormat}" pattern="dd/MM/yyyy"/>
-                            </td>
-                            <td>
-                                <fmt:parseDate value="${card.returnDate}" pattern="yyyy-MM-dd" type="date"
-                                               var="returnDateFormat"/>
-                                <fmt:formatDate value="${returnDateFormat}" pattern="dd/MM/yyyy"/>
-                            </td>
-                            <td>
-                                <c:if test="${card.status == false}">
-                                    <button
-                                            type="button"
-                                            class="btn btn-primary"
-                                            disabled>
-                                        Trả sách
-                                    </button>
-                                </c:if>
-                                <c:if test="${card.status ==true}">
+                    <!--PHẦN HIỂN THỊ BẢNG BOOK-->
+                    <h2>Danh sách sách</h2>
+                    <table class="table">
+                        <thread>
+                            <tr>
+                                <th scope="col">Mã sách</th>
+                                <th scope="col">Tên sách</th>
+                                <th scope="col">Tác giả</th>
+                                <th scope="col">Mô tả</th>
+                                <th scope="col">Số lượng</th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thread>
+                        <tbody>
+                        <c:forEach items="${books}" var="book">
+                            <tr class="col">
+                                <td>${book.bookId}</td>
+                                <td>${book.bookName}</td>
+                                <td>${book.author}</td>
+                                <td>${book.description}</td>
+                                <td>${book.quantity}</td>
+                                <td>
+                                    <form action="/library" method="post">
+                                        <input type="hidden" name="action" value="initBorrow">
+                                        <input type="hidden" name="initBookId" value="${book.bookId}">
+                                        <input type="hidden" name="initBookName" value="${book.bookName}">
+                                        <input type="hidden" name="initAuthor" value="${book.author}">
+                                        <input type="hidden" name="initDescription" value="${book.description}">
+                                        <input type="hidden" name="initQuantity" value="${book.quantity}">
+                                        <input type="submit" class="btn btn-primary" value="Borrow">
+                                    </form>
+                                </td>
+                                <td>
                                     <button
                                             type="button"
                                             class="btn btn-primary"
                                             data-bs-toggle="modal"
-                                            data-bs-target="#delCardModal"
-                                            data-bs-cardId="${card.cardId}">
-                                        Trả sách
+                                            data-bs-target="#editBookModal"
+                                            data-bs-bookId="${book.bookId}"
+                                            data-bs-bookName="${book.bookName}"
+                                            data-bs-author="${book.author}"
+                                            data-bs-description="${book.description}"
+                                            data-bs-quantity="${book.quantity}">
+                                        Edit
                                     </button>
-                                </c:if>
-                            </td>
-                        </tr>
-                    </c:forEach>
-                    </tbody>
-                </table>
+                                </td>
+                                <td>
+                                    <button
+                                            type="button"
+                                            class="btn btn-primary"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#delBookModal"
+                                            data-bs-bookId="${book.bookId}">
+                                        Del
+                                    </button>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                        </tbody>
+                    </table>
+                    <!--KẾT THÚC PHẦN HIỂN THỊ BẢNG BOOK-->
 
-                <!--TẠO MODAL TRẢ SÁCH-->
+                    <!--TẠO MODAL SỬA THÔNG TIN SÁCH-->
+                    <div class="modal fade"
+                         id="editBookModal"
+                         tabindex="-1"
+                         aria-labelledby="editBookModalLabel"
+                         aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="editBookModalLabel">Sửa thông tin</h5>
+                                    <button type="button"
+                                            class="btn-close"
+                                            data-bs-dismiss="modal"
+                                            aria-label="Close">
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="/library" method="post">
+                                        <input type="hidden" name="action" value="editBook">
+                                        <div class="mb-3">
+                                            <input type="hidden" class="form-control" id="bookId" name="bookId"/>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="bookName" class="col-form-label">Tên sách:</label>
+                                            <input type="text" class="form-control" id="bookName" name="newBookName"
+                                                   required/>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="author" class="col-form-label">Tác giả:</label>
+                                            <input type="text" class="form-control" id="author" name="newAuthor"
+                                                   required/>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="description" class="col-form-label">Mô tả:</label>
+                                            <input type="text" class="form-control" id="description"
+                                                   name="newDescription" required/>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="quantity" class="col-form-label">Số lượng:</label>
+                                            <input type="number" class="form-control" id="quantity"
+                                                   name="newQuantity"
+                                                   required/>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                Close
+                                            </button>
+                                            <input type="submit" class="btn btn-secondary" value="OK">
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--KẾT THÚC TẠO MODAL SỬA THÔNG TIN SÁCH-->
+
+                    <!--TẠO MODAL XÓA SÁCH-->
+                    <div class="modal fade"
+                         id="delBookModal"
+                         tabindex="-1"
+                         aria-labelledby="delBookModalLabel"
+                         aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="delBookModalLabel">Bạn có chắc chắn muốn xóa sách
+                                        này?</h5>
+                                    <button type="button"
+                                            class="btn-close"
+                                            data-bs-dismiss="modal"
+                                            aria-label="Close">
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="/library" method="post">
+                                        <input type="hidden" name="action" value="delBook">
+                                        <div class="mb-3">
+                                            <input type="hidden" class="form-control" id="delBookId"
+                                                   name="delBookId"/>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                Close
+                                            </button>
+                                            <input type="submit" class="btn btn-secondary" value="OK">
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--KẾT THÚC TẠO MODAL XÓA SÁCH-->
+
+                </div>
+                <!--KẾT THÚC NỘI DUNG CHÍNH CỦA TRANG BOOK-->
+            </div>
+        </c:if>
+        <!--KẾT THÚC PHẦN NỘI DUNG CỦA TRANG BOOK-->
+
+        <!--PHẦN NỘI DUNG CỦA TRANG STUDENT-->
+        <c:if test="${select==2}">
+            <div class="content">
+
+                <!--TẠO CÁC NÚT SERVICE BÊN TRÁI-->
+                <div class="service">
+                    <button
+                            type="button"
+                            class="btn btn-primary"
+                            data-bs-toggle="modal"
+                            data-bs-target="#createStuModal">
+                        Create
+                    </button>
+                    <button
+                            type="button"
+                            class="btn btn-primary"
+                            data-bs-toggle="modal"
+                            data-bs-target="#searchStuModal"
+                            data-bs-country>
+                        Search
+                    </button>
+                </div>
+                <!--KẾT THÚC TẠO CÁC NÚT SERVICE BÊN TRÁI-->
+
+                <!--TẠO MODAL THÊM SINH VIÊN-->
                 <div class="modal fade"
-                     id="delCardModal"
+                     id="createStuModal"
                      tabindex="-1"
-                     aria-labelledby="delCardModalLabel"
+                     aria-labelledby="createStuModalLabel"
                      aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="delCardModalLabel">Trả sách</h5>
+                                <h5 class="modal-title" id="createStuModalLabel">Thêm sinh viên</h5>
                                 <button type="button"
                                         class="btn-close"
                                         data-bs-dismiss="modal"
@@ -296,13 +358,19 @@
                             </div>
                             <div class="modal-body">
                                 <form action="/library" method="post">
-                                    <input type="hidden" name="action" value="delCard">
+                                    <input type="hidden" name="action" value="createStu">
                                     <div class="mb-3">
-                                        <input type="hidden" class="form-control" id="delCardId" name="delCardId"/>
+                                        <label for="createStuName" class="col-form-label">Tên sinh viên:</label>
+                                        <input type="text" class="form-control" id="createStuName" name="createStuName"
+                                               required/>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="createGrade" class="col-form-label">Lớp:</label>
+                                        <input type="text" class="form-control" id="createGrade" name="createGrade"
+                                               required/>
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary"
-                                                data-bs-dismiss="modal">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                                             Close
                                         </button>
                                         <input type="submit" class="btn btn-secondary" value="OK">
@@ -312,12 +380,314 @@
                         </div>
                     </div>
                 </div>
+                <!--KẾT THÚC TẠO MODAL THÊM SINH VIÊN-->
+
+                <!--TẠO MODAL TÌM KIẾM SINH VIÊN THEO TÊN-->
+                <div class="modal fade"
+                     id="searchStuModal"
+                     tabindex="-1"
+                     aria-labelledby="searchStuModalLabel"
+                     aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="searchStuModalLabel">Tìm kiếm sinh viên theo tên</h5>
+                                <button type="button"
+                                        class="btn-close"
+                                        data-bs-dismiss="modal"
+                                        aria-label="Close">
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="/library" method="post">
+                                    <input type="hidden" name="action" value="searchStuByName">
+                                    <div class="mb-3">
+                                        <label for="searchStuName" class="col-form-label">Tên sinh viên:</label>
+                                        <input type="text" class="form-control" id="searchStuName" name="searchStuName"
+                                               required/>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                            Close
+                                        </button>
+                                        <input type="submit" class="btn btn-secondary" value="OK">
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--KẾT THÚC TẠO MODAL TÌM KIẾM SINH VIÊN THEO TÊN-->
+
+                <!--NỘI DUNG CHÍNH CỦA TRANG STUDENT-->
+                <div class="main-content">
+                    <div class="popup">
+                        <c:if test="${error!=null}">
+                            <h3>${error}</h3>
+                        </c:if>
+                    </div>
+
+                    <!--PHẦN HIỂN THỊ BẢNG STUDENT-->
+                    <h2>Danh sách sinh viên</h2>
+                    <table class="table">
+                        <thread>
+                            <tr>
+                                <th scope="col">Mã sinh viên</th>
+                                <th scope="col">Tên sinh viên</th>
+                                <th scope="col">Lớp</th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thread>
+                        <tbody>
+                        <c:forEach items="${students}" var="student">
+                            <tr class="col">
+                                <td>${student.stuId}</td>
+                                <td>${student.stuName}</td>
+                                <td>${student.grade}</td>
+                                <td>
+                                    <button
+                                            type="button"
+                                            class="btn btn-primary"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editStuModal"
+                                            data-bs-stuId="${student.stuId}"
+                                            data-bs-stuName="${student.stuName}"
+                                            data-bs-grade="${student.grade}">
+                                        Edit
+                                    </button>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                        </tbody>
+                    </table>
+                    <!--KẾT THÚC PHẦN HIỂN THỊ BẢNG STUDENT-->
+
+                    <!--TẠO MODAL SỬA THÔNG TIN SINH VIÊN-->
+                    <div class="modal fade"
+                         id="editStuModal"
+                         tabindex="-1"
+                         aria-labelledby="editStuModalLabel"
+                         aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="editStuModalLabel">Sửa thông tin sinh viên</h5>
+                                    <button type="button"
+                                            class="btn-close"
+                                            data-bs-dismiss="modal"
+                                            aria-label="Close">
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="/library" method="post">
+                                        <input type="hidden" name="action" value="editStu">
+                                        <div class="mb-3">
+                                            <input type="hidden" class="form-control" id="stuId" name="stuId"/>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="stuName" class="col-form-label">Tên sinh viên:</label>
+                                            <input type="text" class="form-control" id="stuName" name="newStuName"
+                                                   required/>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="grade" class="col-form-label">Lớp:</label>
+                                            <input type="text" class="form-control" id="grade" name="newGrade"
+                                                   required/>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                Close
+                                            </button>
+                                            <input type="submit" class="btn btn-secondary" value="OK">
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--KẾT THÚC TẠO MODAL SỬA THÔNG TIN SINH VIÊN-->
+
+                </div>
+                <!--KẾT THÚC NỘI DUNG CHÍNH CỦA TRANG STUDENT-->
+
             </div>
         </c:if>
+        <!--KẾT THÚC PHẦN NỘI DUNG CỦA TRANG STUDENT-->
+
+
+        <!--PHẦN NỘI DUNG CỦA TRANG CARD-->
+        <c:if test="${select==3}">
+            <div class="content">
+
+                <!--TẠO CÁC NÚT SERVICE BÊN TRÁI-->
+                <div class="service">
+                    <button
+                            type="button"
+                            class="btn btn-primary"
+                            data-bs-toggle="modal"
+                            data-bs-target="#searchCardModal"
+                            data-bs-country>
+                        Search
+                    </button>
+                </div>
+                <!--KẾT THÚC TẠO CÁC NÚT SERVICE BÊN TRÁI-->
+
+                <!--TẠO MODAL TÌM KIẾM THẺ THEO MÃ SỐ-->
+                <div class="modal fade"
+                     id="searchCardModal"
+                     tabindex="-1"
+                     aria-labelledby="searchCardModalLabel"
+                     aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="searchCardModalLabel">Tìm kiếm thẻ theo mã số</h5>
+                                <button type="button"
+                                        class="btn-close"
+                                        data-bs-dismiss="modal"
+                                        aria-label="Close">
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="/library" method="post">
+                                    <input type="hidden" name="action" value="searchCardById">
+                                    <div class="mb-3">
+                                        <label for="searchCardId" class="col-form-label">Mã số thẻ:</label>
+                                        <input type="text" class="form-control" id="searchCardId"
+                                               name="searchCardId"
+                                               required/>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                            Close
+                                        </button>
+                                        <input type="submit" class="btn btn-secondary" value="OK">
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--KẾT THÚC TẠO MODAL TÌM KIẾM THẺ THEO MÃ SỐ-->
+
+                <!--NỘI DUNG CHÍNH CỦA TRANG CARD-->
+                <div class="main-content">
+                    <div class="popup">
+                        <c:if test="${error!=null}">
+                            <h3>${error}</h3>
+                        </c:if>
+                    </div>
+
+                    <!--PHẦN HIỂN THỊ BẢNG CARD-->
+                    <h2>Danh sách thẻ mượn sách</h2>
+                    <table class="table">
+                        <thread>
+                            <tr>
+                                <th scope="col">Mã thẻ</th>
+                                <th scope="col">Tên sách</th>
+                                <th scope="col">Tác giả</th>
+                                <th scope="col">Tên sinh viên</th>
+                                <th scope="col">Lớp</th>
+                                <th scope="col">Ngày mượn</th>
+                                <th scope="col">Ngày trả</th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thread>
+                        <tbody>
+                        <c:forEach items="${cards}" var="card">
+                            <tr class="col">
+                                <td>${card.cardId}</td>
+                                <td>${card.book.getBookName()}</td>
+                                <td>${card.book.getAuthor()}</td>
+                                <td>${card.student.getStuName()}</td>
+                                <td>${card.student.getGrade()}</td>
+                                <td>
+                                    <fmt:parseDate value="${card.loanDate}" pattern="yyyy-MM-dd" type="date"
+                                                   var="loanDateFormat"/>
+                                    <fmt:formatDate value="${loanDateFormat}" pattern="dd/MM/yyyy"/>
+                                </td>
+                                <td>
+                                    <fmt:parseDate value="${card.returnDate}" pattern="yyyy-MM-dd" type="date"
+                                                   var="returnDateFormat"/>
+                                    <fmt:formatDate value="${returnDateFormat}" pattern="dd/MM/yyyy"/>
+                                </td>
+                                <td>
+                                    <c:if test="${card.status == false}">
+                                        <button
+                                                type="button"
+                                                class="btn btn-primary"
+                                                disabled>
+                                            Return
+                                        </button>
+                                    </c:if>
+                                    <c:if test="${card.status ==true}">
+                                        <button
+                                                type="button"
+                                                class="btn btn-primary"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#delCardModal"
+                                                data-bs-cardId="${card.cardId}">
+                                            Return
+                                        </button>
+                                    </c:if>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                        </tbody>
+                    </table>
+                    <!--KẾT THÚC PHẦN HIỂN THỊ BẢNG CARD-->
+
+                    <!--TẠO MODAL TRẢ SÁCH-->
+                    <div class="modal fade"
+                         id="delCardModal"
+                         tabindex="-1"
+                         aria-labelledby="delCardModalLabel"
+                         aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="delCardModalLabel">Trả sách</h5>
+                                    <button type="button"
+                                            class="btn-close"
+                                            data-bs-dismiss="modal"
+                                            aria-label="Close">
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="/library" method="post">
+                                        <input type="hidden" name="action" value="delCard">
+                                        <div class="mb-3">
+                                            <input type="hidden" class="form-control" id="delCardId"
+                                                   name="delCardId"/>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">
+                                                Close
+                                            </button>
+                                            <input type="submit" class="btn btn-secondary" value="OK">
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--KẾT THÚC TẠO MODAL TRẢ SÁCH-->
+
+                </div>
+                <!--KẾT THÚC NỘI DUNG CHÍNH CỦA TRANG CARD-->
+
+            </div>
+        </c:if>
+        <!--KẾT THÚC PHẦN NỘI DUNG CỦA TRANG CARD-->
+
     </div>
+    <!--KẾT THÚC THÂN TRANG GỒM CÁC NÚT SERVICE VÀ NỘI DUNG CHÍNH CỦA TRANG-->
+
 </div>
 </body>
 <script src="/asset/bootstrap.bundle.min.js"></script>
 <script src="/asset/book.js"></script>
 <script src="/asset/card.js"></script>
+<script src="/asset/student.js"></script>
 </html>

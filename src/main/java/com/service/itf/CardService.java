@@ -9,5 +9,7 @@ public interface CardService {
 
     void create(Card card);
 
-    void update (int cardId);
+    void update (String cardId);
+
+    List<Card> searchById (String id);
 }

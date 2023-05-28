@@ -1,6 +1,7 @@
 package com.repository.impl;
 
 import com.bean.Book;
+import com.bean.Student;
 import com.database.DBConnection;
 import com.database.MyQuery;
 import com.repository.itf.BookRepository;
@@ -99,5 +100,70 @@ public class BookRepositoryImpl implements BookRepository {
                 DBConnection.close();
             }
         }
+    }
+
+    @Override
+    public void create(Book book) {
+        Connection connection = DBConnection.getConnection();
+        PreparedStatement statement = null;
+
+        if(connection!=null) {
+            try {
+                statement = connection.prepareStatement(MyQuery.CREATE_BOOK);
+                statement.setInt(1,book.getBookId());
+                statement.setString(2, book.getBookName());
+                statement.setString(3, book.getAuthor());
+                statement.setString(4, book.getDescription());
+                statement.setInt(5, book.getQuantity());
+                statement.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }finally {
+                try {
+                    statement.close();
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                DBConnection.close();
+            }
+        }
+    }
+
+    @Override
+    public List<Book> searchByName(String str) {
+        Connection connection = DBConnection.getConnection();
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+        List<Book> bookList = new ArrayList<>();
+
+        if (connection != null) {
+            try {
+                statement = connection.prepareStatement(MyQuery.SEARCH_BOOK_BY_NAME);
+                statement.setString(1,str);
+
+                resultSet = statement.executeQuery();
+                while (resultSet.next()) {
+                    int bookId = resultSet.getInt("bookId");
+                    String bookName = resultSet.getString("bookName");
+                    String author = resultSet.getString("author");
+                    String description = resultSet.getString("description");
+                    int quantity = resultSet.getInt("quantity");
+
+                    bookList.add(new Book(bookId, bookName, author, description, quantity));
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    statement.close();
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                DBConnection.close();
+            }
+        }
+        return bookList;
     }
 }

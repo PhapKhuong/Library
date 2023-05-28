@@ -1,6 +1,8 @@
 package com.service.itf;
 
 import com.bean.Book;
+import com.bean.Student;
+import com.google.protobuf.ValueOrBuilder;
 
 import java.util.List;
 
@@ -10,4 +12,8 @@ public interface BookService {
     void update(Book book);
 
     void delete (int id);
+
+    void create (Book book);
+
+    List<Book> searchByName(String str);
 }

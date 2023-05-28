@@ -14,4 +14,19 @@ public class StudentServiceImpl implements StudentService {
     public List<Student> display() {
         return repository.display();
     }
+
+    @Override
+    public void create(Student student) {
+        repository.create(student);
+    }
+
+    @Override
+    public List<Student> searchByName(String str) {
+        return repository.searchByName(str);
+    }
+
+    @Override
+    public void update(Student student) {
+        repository.update(student);
+    }
 }

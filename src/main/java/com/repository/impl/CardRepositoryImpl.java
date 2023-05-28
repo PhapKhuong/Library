@@ -27,7 +27,7 @@ public class CardRepositoryImpl implements CardRepository {
                 statement = connection.prepareStatement(MyQuery.SELECT_ALL_CARD);
                 resultSet = statement.executeQuery();
                 while (resultSet.next()) {
-                    int cardId = resultSet.getInt("cardId");
+                    String cardId = resultSet.getString("cardId");
 
                     int bookId = resultSet.getInt("bookId");
                     String bookName = resultSet.getString("bookName");
@@ -79,7 +79,7 @@ public class CardRepositoryImpl implements CardRepository {
         if (connection != null) {
             try {
                 statement = connection.prepareStatement(MyQuery.INSERT_NEW_CARD);
-                statement.setInt(1, card.getCardId());
+                statement.setString(1, card.getCardId());
                 statement.setInt(2, card.getBook().getBookId());
                 statement.setInt(3, card.getStudent().getStuId());
                 int status = 0;
@@ -109,13 +109,13 @@ public class CardRepositoryImpl implements CardRepository {
     }
 
     @Override
-    public void update(int cardId) {
+    public void update(String cardId) {
         Connection connection = DBConnection.getConnection();
         PreparedStatement statement = null;
         if (connection != null) {
             try {
                 statement = connection.prepareStatement(MyQuery.UPDATE_CARD);
-                statement.setInt(1,cardId);
+                statement.setString(1, cardId);
                 statement.executeUpdate();
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -129,5 +129,62 @@ public class CardRepositoryImpl implements CardRepository {
                 DBConnection.close();
             }
         }
+    }
+
+    @Override
+    public List<Card> searchById(String id) {
+        Connection connection = DBConnection.getConnection();
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+        List<Card> cardList = new ArrayList<>();
+
+        if (connection != null) {
+            try {
+                statement = connection.prepareStatement(MyQuery.SEARCH_CARD_BY_ID);
+                statement.setString(1, id);
+                resultSet = statement.executeQuery();
+                while (resultSet.next()) {
+                    String cardId = resultSet.getString("cardId");
+
+                    int bookId = resultSet.getInt("bookId");
+                    String bookName = resultSet.getString("bookName");
+                    String author = resultSet.getString("author");
+                    String description = resultSet.getString("description");
+                    int quantity = resultSet.getInt("quantity");
+
+                    int stuId = resultSet.getInt("stuId");
+                    String stuName = resultSet.getString("stuName");
+                    String grade = resultSet.getString("grade");
+
+                    int s = resultSet.getInt("status");
+                    boolean status;
+                    if (s == 1) {
+                        status = true;
+                    } else {
+                        status = false;
+                    }
+                    Date d1 = resultSet.getDate("loanDate");
+                    LocalDate loanDate = MuUtil.convertToLocalDateViaSqlDate(d1);
+                    Date d2 = resultSet.getDate("returnDate");
+                    LocalDate returnDate = MuUtil.convertToLocalDateViaSqlDate(d2);
+
+                    Book book = new Book(bookId, bookName, author, description, quantity);
+                    Student student = new Student(stuId, stuName, grade);
+
+                    cardList.add(new Card(cardId, book, student, status, loanDate, returnDate));
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    statement.close();
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                DBConnection.close();
+            }
+        }
+        return cardList;
     }
 }

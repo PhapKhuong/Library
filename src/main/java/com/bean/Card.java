@@ -3,7 +3,7 @@ package com.bean;
 import java.time.LocalDate;
 
 public class Card {
-    private int cardId;
+    private String cardId;
     private Book book;
     private Student student;
     private boolean status;
@@ -13,7 +13,7 @@ public class Card {
     public Card() {
     }
 
-    public Card(int cardId, Book book, Student student, boolean status, LocalDate loanDate, LocalDate returnDate) {
+    public Card(String cardId, Book book, Student student, boolean status, LocalDate loanDate, LocalDate returnDate) {
         this.cardId = cardId;
         this.book = book;
         this.student = student;
@@ -22,11 +22,11 @@ public class Card {
         this.returnDate = returnDate;
     }
 
-    public int getCardId() {
+    public String getCardId() {
         return cardId;
     }
 
-    public void setCardId(int cardId) {
+    public void setCardId(String cardId) {
         this.cardId = cardId;
     }
 

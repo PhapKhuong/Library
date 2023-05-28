@@ -42,17 +42,10 @@ public class LibraryServlet extends HttpServlet {
             case "card":
                 showListCard(req, resp);
                 break;
-            case "borrow":
-                showBorrowForm(req, resp);
-                break;
             default:
                 showListBook(req, resp);
                 break;
         }
-    }
-
-    private void showBorrowForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.getRequestDispatcher("WEB-INF/view/borrow.jsp").forward(req, resp);
     }
 
     private void showListBook(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -85,7 +78,7 @@ public class LibraryServlet extends HttpServlet {
         String action = req.getParameter("action");
         switch (action) {
             case "editBook":
-                doEdit(req, resp);
+                doEditBook(req, resp);
                 break;
             case "delBook":
                 doDelBook(req, resp);
@@ -99,12 +92,30 @@ public class LibraryServlet extends HttpServlet {
             case "delCard":
                 doDelCard(req, resp);
                 break;
+            case "createBook":
+                doCreateBook(req, resp);
+                break;
+            case "createStu":
+                doCreateStu(req, resp);
+                break;
+            case "searchBookByName":
+                doSearchBookByName(req, resp);
+                break;
+            case "searchStuByName":
+                doSearchStuByName(req, resp);
+                break;
+            case "searchCardById":
+                doSearchCardById(req, resp);
+                break;
+            case "editStu":
+                doEditStu(req, resp);
+                break;
             default:
                 break;
         }
     }
 
-    private void doEdit(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    private void doEditBook(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         int bookId = Integer.parseInt(req.getParameter("bookId"));
         String newBookName = req.getParameter("newBookName");
         String newAuthor = req.getParameter("newAuthor");
@@ -131,12 +142,27 @@ public class LibraryServlet extends HttpServlet {
         } else {
             List<Card> cards = cardService.display();
             int maxCardId = 0;
-            for (Card card : cards) {
-                if (card.getCardId() >= maxCardId) {
-                    maxCardId = card.getCardId();
+            if (cards.size() == 0) {
+                maxCardId = 1;
+            } else {
+                for (Card card : cards) {
+                    int id = Integer.parseInt(card.getCardId().substring(3));
+                    if (id + 1 > maxCardId) {
+                        maxCardId = id + 1;
+                    }
                 }
             }
-            int initCardId = maxCardId + 1;
+
+            String initCardId;
+            if (maxCardId < 10) {
+                initCardId = "MS-000" + maxCardId;
+            } else if (maxCardId < 100) {
+                initCardId = "MS-00" + maxCardId;
+            } else if (maxCardId < 1000) {
+                initCardId = "MS-0" + maxCardId;
+            } else {
+                initCardId = "MS-" + maxCardId;
+            }
 
             int initBookId = Integer.parseInt(req.getParameter("initBookId"));
             String initBookName = req.getParameter("initBookName");
@@ -156,8 +182,8 @@ public class LibraryServlet extends HttpServlet {
         req.getRequestDispatcher("WEB-INF/view/borrow.jsp").forward(req, resp);
     }
 
-    private void doBorrow(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        int cardId = Integer.parseInt(req.getParameter("cardId"));
+    private void doBorrow(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+        String cardId = req.getParameter("cardId");
 
         int bookId = Integer.parseInt(req.getParameter("borrowBookId"));
         String bookName = req.getParameter("borrowBookName");
@@ -168,31 +194,36 @@ public class LibraryServlet extends HttpServlet {
         bookService.update(book);
 
         Student student = null;
-        List<Student> students = studentService.display();
-        int stuId = Integer.parseInt(req.getParameter("borrowStuId"));
-        for (Student stu : students) {
-            if (stu.getStuId() == stuId) {
-                student = stu;
-                break;
+        try {
+            List<Student> students = studentService.display();
+            int stuId = Integer.parseInt(req.getParameter("borrowStuId"));
+            for (Student stu : students) {
+                if (stu.getStuId() == stuId) {
+                    student = stu;
+                    break;
+                }
             }
+            LocalDate loanDate = LocalDate.parse(req.getParameter("loanDate"));
+            LocalDate returnDate = LocalDate.parse(req.getParameter("returnDate"));
+
+            Card card = new Card(cardId, book, student, true, loanDate, returnDate);
+            cardService.create(card);
+            resp.sendRedirect("/library");
+        } catch (NumberFormatException e) {
+            String errorMsg = "Bạn chưa chọn tên sinh viên";
+            req.setAttribute("error", errorMsg);
+            req.getRequestDispatcher("WEB-INF/view/borrow.jsp").forward(req, resp);
         }
-
-        LocalDate loanDate = LocalDate.parse(req.getParameter("loanDate"));
-        LocalDate returnDate = LocalDate.parse(req.getParameter("returnDate"));
-
-        Card card = new Card(cardId, book, student, true, loanDate, returnDate);
-        cardService.create(card);
-        resp.sendRedirect("/library");
     }
 
     private void doDelCard(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         List<Card> cards = cardService.display();
         List<Book> books = bookService.display();
 
-        int cardId = Integer.parseInt(req.getParameter("delCardId"));
+        String cardId = req.getParameter("delCardId");
         int bookId = 0;
         for (Card card : cards) {
-            if (card.getCardId() == cardId) {
+            if (card.getCardId().equals(cardId)) {
                 bookId = card.getBook().getBookId();
                 break;
             }
@@ -205,6 +236,116 @@ public class LibraryServlet extends HttpServlet {
             }
         }
         cardService.update(cardId);
-        resp.sendRedirect("/library");
+        resp.sendRedirect("/library?action=card");
+    }
+
+    private void doCreateBook(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        List<Book> books = bookService.display();
+        int bookId = 0;
+        int max = 0;
+        if (books.size() == 0) {
+            bookId = 1;
+        } else {
+            for (Book book : books) {
+                if (book.getBookId() > max) {
+                    max = book.getBookId();
+                }
+            }
+            bookId = max + 1;
+        }
+        String bookName = req.getParameter("createBookName");
+        String author = req.getParameter("createAuthor");
+        String description = req.getParameter("createDescription");
+        int quantity = Integer.parseInt(req.getParameter("createQuantity"));
+
+        Book book = new Book(bookId, bookName, author, description, quantity);
+        bookService.create(book);
+        resp.sendRedirect("/library?action=book");
+    }
+
+    private void doCreateStu(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        List<Student> students = studentService.display();
+        int stuId = 0;
+        int max = 0;
+        if (students.size() == 0) {
+            stuId = 1;
+        } else {
+            for (Student stu : students) {
+                if (stu.getStuId() > max) {
+                    max = stu.getStuId();
+                }
+            }
+            stuId = max + 1;
+        }
+        String stuName = req.getParameter("createStuName");
+        String grade = req.getParameter("createGrade");
+
+        Student student = new Student(stuId, stuName, grade);
+        studentService.create(student);
+        resp.sendRedirect("/library?action=student");
+    }
+
+    private void doSearchBookByName(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String str = req.getParameter("searchBookName");
+        String bookName = "%" + str + "%";
+        List<Book> books = bookService.searchByName(bookName);
+
+        if (books.size() == 0) {
+            int select = 1;
+            String errorMsg = "List of book is empty!";
+            req.setAttribute("select", select);
+            req.setAttribute("error", errorMsg);
+        } else {
+            int select = 1;
+            req.setAttribute("select", select);
+            req.setAttribute("books", books);
+        }
+        req.getRequestDispatcher("WEB-INF/view/home.jsp").forward(req, resp);
+    }
+
+    private void doSearchStuByName(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String str = req.getParameter("searchStuName");
+        String StuName = "%" + str + "%";
+        List<Student> students = studentService.searchByName(StuName);
+
+        if (students.size() == 0) {
+            int select = 2;
+            String errorMsg = "List of student is empty!";
+            req.setAttribute("select", select);
+            req.setAttribute("error", errorMsg);
+        } else {
+            int select = 2;
+            req.setAttribute("select", select);
+            req.setAttribute("students", students);
+        }
+        req.getRequestDispatcher("WEB-INF/view/home.jsp").forward(req, resp);
+    }
+
+    private void doSearchCardById(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String str = req.getParameter("searchCardId");
+        String cardId = "%" + str + "%";
+        List<Card> cards = cardService.searchById(cardId);
+
+        if (cards.size() == 0) {
+            int select = 3;
+            String errorMsg = "List of card is empty!";
+            req.setAttribute("select", select);
+            req.setAttribute("error", errorMsg);
+        } else {
+            int select = 3;
+            req.setAttribute("select", select);
+            req.setAttribute("cards", cards);
+        }
+        req.getRequestDispatcher("WEB-INF/view/home.jsp").forward(req, resp);
+    }
+
+    private void doEditStu(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        int stuId = Integer.parseInt(req.getParameter("stuId"));
+        String newStuName = req.getParameter("newStuName");
+        String newGrade = req.getParameter("newGrade");
+
+        Student student = new Student(stuId, newStuName, newGrade);
+        studentService.update(student);
+        resp.sendRedirect("/library?action=student");
     }
 }

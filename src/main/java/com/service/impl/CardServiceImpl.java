@@ -21,7 +21,12 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public void update(int cardId) {
+    public void update(String cardId) {
         repository.update(cardId);
+    }
+
+    @Override
+    public List<Card> searchById(String id) {
+        return repository.searchById(id);
     }
 }
